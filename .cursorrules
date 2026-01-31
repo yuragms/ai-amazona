@@ -1,0 +1,89 @@
+# Cursor Rules
+
+## Instructions
+
+- Record fixes for mistakes or corrections to avoid repetition in the `Lessons` section.
+- Organize thoughts and plan steps before starting a task in the `Scratchpad` section.
+- Clear old tasks if necessary.
+- Use todo markers for progress tracking:
+  - `[X]` Completed tasks
+  - `[ ]` Pending tasks
+- Update Scratchpad after completing subtasks.
+- Reflect and plan after milestones for better task management.
+- Always refer to Scratchpad before planning the next step.
+
+## Lessons
+
+## Scratchpad
+
+Development steps for ecommerce website (Amazon-like) with admin dashboard.
+
+**Stack:** TypeScript, Next.js 16, Shadcn, Lucide, Zod, Zustand, Recharts, Resend, Uploadthing, Prisma, PostgreSQL, next-auth@beta, Stripe.
+
+---
+
+### 1. Project Setup and Configuration [X]
+
+- [x] Initialize Next.js 16 with TypeScript, App Router, Tailwind
+- [x] Set up folder structure: `app/(shop)`, `app/(admin)`, `app/(auth)`, `lib`, `components`, `hooks`
+- [x] Install and configure Shadcn UI: `npx shadcn@latest init`
+- [x] Add Shadcn components as needed (Button, Card, Input, Form, Table, Dialog, etc.)
+- [x] Install Lucide React for icons
+- [x] Install Zod for schema validation (forms, API)
+- [x] Install Zustand for client state (cart, UI)
+- [x] Install Recharts for admin charts
+- [x] Install Resend SDK for transactional emails
+- [ ] Set up Uploadthing (app + API route) for product images
+- [x] Install Prisma, configure PostgreSQL (DATABASE_URL)
+- [ ] Install next-auth@beta (v5), configure auth route and session
+- [ ] Install Stripe (server + client), set webhook route
+- [x] Add env validation with Zod (.env.local template)
+
+### 2. Database and Auth [ ]
+
+- [ ] Define Prisma schema: User, Account, Session (NextAuth), Product, Category, Order, OrderItem, Review, CartItem, Address
+- [ ] Add roles: `user` / `admin` (e.g. on User or separate Admin model)
+- [ ] Run migrations, seed categories and sample products
+- [ ] Configure next-auth@beta: Credentials + OAuth (Google/GitHub), Prisma adapter, callbacks for role
+- [ ] Protect routes: middleware for `/admin/*` (admin only), `/dashboard/*` (authenticated)
+- [ ] Create auth API helpers: `auth()` in server components, session in client via provider
+
+### 3. Customer-Facing Shop [ ]
+
+- [ ] **Layout (home):** `app/(shop)/layout` — Header (logo, search, nav, cart icon), Footer
+- [ ] **Homepage:** Hero/banner, featured categories, “Latest products” grid (Shadcn Card)
+- [ ] **Catalog:** List products with filters (category, price), search, pagination; sidebar with Shadcn
+- [ ] **Product page:** Dynamic route `[slug]` — gallery (Uploadthing images), title, price, description, stock, “Add to cart” (Zustand), reviews list + review form (Zod), related products
+- [ ] **Cart:** Zustand store, cart page with quantity update/remove, persist (e.g. localStorage or DB for logged-in)
+- [ ] **Checkout:** Multi-step or single page — shipping form (Zod), Stripe Checkout or Elements, order creation in DB
+- [ ] **User dashboard:** Order history, profile edit, saved addresses; use `auth()` and Prisma
+
+### 4. Admin Dashboard [ ]
+
+- [ ] **Layout:** `app/(admin)/admin/layout` — sidebar nav (Lucide icons), restrict to `role === 'admin'`
+- [ ] **Overview:** Recharts — revenue over time (line), orders (bar), key metrics cards (total revenue, orders, customers, AOV); data from Prisma aggregates
+- [ ] **Products:** CRUD table (Shadcn Table), create/edit form with Zod; images via Uploadthing
+- [ ] **Orders:** List orders, filters (status, date), detail view, status updates
+- [ ] **Users:** List users, toggle admin (if applicable)
+- [ ] **Low stock / reports:** Optional — low stock list, export (CSV) using Recharts/data from Prisma
+
+### 5. Emails and Payments [ ]
+
+- [ ] Resend: Order confirmation, shipping update, password reset (if using credentials); use Server Actions or API routes
+- [ ] Stripe: Checkout Session creation, webhook for `checkout.session.completed` / `payment_intent.succeeded` — create Order and OrderItems, update inventory
+- [ ] Store Stripe customer/session IDs if needed for receipts or portal
+
+### 6. Polish and Deploy [ ]
+
+- [ ] Loading and error states (Shadcn skeletons, error boundaries)
+- [ ] SEO: metadata, Open Graph for product pages
+- [ ] Security: validate all inputs with Zod, rate limit auth/checkout, secure env
+- [ ] Deploy: Vercel (or other), PostgreSQL (e.g. Neon/Supabase), set env for Stripe webhook, Resend, Uploadthing, NextAuth URL
+- [ ] Optional: tests (e.g. Vitest + Playwright), CI (lint, typecheck, build)
+
+### 7. Documentation [ ]
+
+- [ ] API documentation
+- [ ] User guide
+- [ ] Admin documentation
+- [ ] Deployment guide
