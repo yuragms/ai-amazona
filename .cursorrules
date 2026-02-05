@@ -41,8 +41,8 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 
 ### 2. Database and Auth [ ]
 
-- [ ] Define Prisma schema: User, Account, Session (NextAuth), Product, Category, Order, OrderItem, Review, CartItem, Address
-- [ ] Add roles: `user` / `admin` (e.g. on User or separate Admin model)
+- [x] Define Prisma schema: User, Account, Session (NextAuth), Product, Category, Order, OrderItem, Review, CartItem, Address
+- [x] Add roles: `user` / `admin` (e.g. on User or separate Admin model)
 - [ ] Run migrations, seed categories and sample products
 - [ ] Configure next-auth@beta: Credentials + OAuth (Google/GitHub), Prisma adapter, callbacks for role
 - [ ] Protect routes: middleware for `/admin/*` (admin only), `/dashboard/*` (authenticated)
