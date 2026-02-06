@@ -35,17 +35,18 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 - [x] Install Resend SDK for transactional emails
 - [ ] Set up Uploadthing (app + API route) for product images
 - [x] Install Prisma, configure PostgreSQL (DATABASE_URL)
-- [ ] Install next-auth@beta (v5), configure auth route and session
+- [x] Install next-auth@beta (v5), configure auth route and session
 - [ ] Install Stripe (server + client), set webhook route
 - [x] Add env validation with Zod (.env.local template)
 
-### 2. Database and Auth [ ]
+### 2. Database and Auth [~]
 
 - [x] Define Prisma schema: User, Account, Session (NextAuth), Product, Category, Order, OrderItem, Review, CartItem, Address
 - [x] Add roles: `user` / `admin` (e.g. on User or separate Admin model)
 - [ ] Run migrations, seed categories and sample products
-- [ ] Configure next-auth@beta: Credentials + OAuth (Google/GitHub), Prisma adapter, callbacks for role
-- [ ] Protect routes: middleware for `/admin/*` (admin only), `/dashboard/*` (authenticated)
+- [x] Configure next-auth@beta: Credentials provider, JWT strategy, callbacks for role (auth.ts, auth.config.ts, proxy)
+- [x] OAuth (Google/GitHub)
+- [x] Protect routes: proxy for `/admin/*` (admin only), `/dashboard/*` (authenticated)
 - [ ] Create auth API helpers: `auth()` in server components, session in client via provider
 
 ### 3. Customer-Facing Shop [ ]
