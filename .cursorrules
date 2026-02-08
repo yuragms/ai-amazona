@@ -55,7 +55,7 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
   - Create `(home)` folder in `app` directory
   - Header with logo, search bar, and navigation
   - Footer with links and social media
-- [ ] Homepage:
+- [x] Homepage:
   - banner carousel
   - latest products
 - [ ] Products Catalog:
