@@ -3,8 +3,6 @@ import { PrismaClient } from "@prisma/client"
 import type { User } from "@prisma/client"
 import bcrypt from "bcryptjs"
 import Credentials from "next-auth/providers/credentials"
-import Google from "next-auth/providers/google"
-import GitHub from "next-auth/providers/github"
 import authConfig from "./auth.config"
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
@@ -72,48 +70,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       },
     }),
-    Google,
-    GitHub,
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
-        const u = user as User & { email?: string | null; name?: string | null; image?: string | null }
-        if (account?.provider === "credentials") {
-          token.role = u.role
-          token.id = u.id
-        } else if (account && u.email) {
-          const dbUser = await prisma.user.upsert({
-            where: { email: u.email },
-            create: {
-              email: u.email,
-              name: u.name ?? undefined,
-              image: u.image ?? undefined,
-              role: "USER",
-            },
-            update: { name: u.name ?? undefined, image: u.image ?? undefined },
-          })
-          await prisma.account.upsert({
-            where: {
-              provider_providerAccountId: {
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-              },
-            },
-            create: {
-              userId: dbUser.id,
-              type: account.type,
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-              access_token: account.access_token ?? undefined,
-              refresh_token: account.refresh_token ?? undefined,
-              expires_at: account.expires_at ?? undefined,
-            },
-            update: {},
-          })
-          token.id = dbUser.id
-          token.role = dbUser.role
-        }
+        token.role = (user as User).role
+        token.id = user.id
       }
       return token
     },
