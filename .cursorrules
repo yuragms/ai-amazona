@@ -3,6 +3,7 @@
 ## Instructions
 
 - Record fixes for mistakes or corrections to avoid repetition in the `Lessons` section.
+- Before installing Shadcn components, check the `components/ui` folder to see what is already there and avoid duplicates.
 - Organize thoughts and plan steps before starting a task in the `Scratchpad` section.
 - Clear old tasks if necessary.
 - Use todo markers for progress tracking:
@@ -58,7 +59,7 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 - [x] Homepage:
   - banner carousel
   - latest products
-- [ ] Products Catalog:
+- [x] Products Catalog:
   - Sidebar with categories and filters
   - Search results
   - Product grid

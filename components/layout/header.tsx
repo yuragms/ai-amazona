@@ -5,13 +5,6 @@ import { useRouter } from "next/navigation"
 import { ShoppingCart, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Products" },
-  { href: "/categories", label: "Categories" },
-]
 
 export function Header() {
   const router = useRouter()
@@ -24,53 +17,56 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center gap-4 px-4 md:gap-6">
-        <Link
-          href="/"
-          className="flex shrink-0 items-center gap-2 font-semibold text-foreground"
-        >
-          <span className="text-xl">Amazona</span>
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+      <div className="container flex h-14 items-center justify-between gap-6 px-6 md:px-8">
+        <div className="flex shrink-0 items-center gap-6">
+          <Link
+            href="/"
+            className="font-semibold text-foreground"
+          >
+            <span className="text-xl">Al Amazona</span>
+          </Link>
+          <Link
+            href="/products"
+            className="text-sm font-medium text-foreground transition-colors hover:underline"
+          >
+            Products
+          </Link>
+        </div>
 
         <form
           onSubmit={handleSearch}
-          className="relative hidden w-full max-w-sm flex-1 items-center md:flex"
+          className="relative mx-6 flex min-w-0 flex-1 items-center max-w-md"
         >
-          <Search className="absolute left-3 size-4 text-muted-foreground" />
+          <Search className="absolute left-3 size-4 shrink-0 text-muted-foreground pointer-events-none" />
           <Input
             name="q"
             type="search"
             placeholder="Search products..."
-            className="pl-9 pr-4"
+            className="h-9 w-full pl-9 pr-9"
             aria-label="Search products"
           />
-          <Button type="submit" variant="secondary" size="sm" className="ml-2">
-            Search
-          </Button>
+          <button
+            type="submit"
+            className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+            aria-label="Search"
+          >
+            <Search className="size-4" />
+          </button>
         </form>
 
-        <nav className="flex items-center gap-4 md:gap-6">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
+        <div className="flex shrink-0 items-center gap-4">
           <Link
             href="/cart"
-            className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             aria-label="Shopping cart"
           >
             <ShoppingCart className="size-5" />
-            <span className="hidden sm:inline">Cart</span>
           </Link>
-        </nav>
+          <Button variant="default" size="sm" asChild>
+            <Link href="/login">Sign In</Link>
+          </Button>
+        </div>
       </div>
     </header>
   )
