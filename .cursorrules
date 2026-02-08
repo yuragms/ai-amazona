@@ -49,15 +49,48 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 - [x] Protect routes: proxy for `/admin/*` (admin only), `/dashboard/*` (authenticated)
 - [ ] Create auth API helpers: `auth()` in server components, session in client via provider
 
-### 3. Customer-Facing Shop [ ]
+### 3. Core Features - Customer Side [ ]
 
-- [ ] **Layout (home):** `app/(shop)/layout` — Header (logo, search, nav, cart icon), Footer
-- [ ] **Homepage:** Hero/banner, featured categories, “Latest products” grid (Shadcn Card)
-- [ ] **Catalog:** List products with filters (category, price), search, pagination; sidebar with Shadcn
-- [ ] **Product page:** Dynamic route `[slug]` — gallery (Uploadthing images), title, price, description, stock, “Add to cart” (Zustand), reviews list + review form (Zod), related products
-- [ ] **Cart:** Zustand store, cart page with quantity update/remove, persist (e.g. localStorage or DB for logged-in)
-- [ ] **Checkout:** Multi-step or single page — shipping form (Zod), Stripe Checkout or Elements, order creation in DB
-- [ ] **User dashboard:** Order history, profile edit, saved addresses; use `auth()` and Prisma
+- [x] Home Layout:
+  - Create `(home)` folder in `app` directory
+  - Header with logo, search bar, and navigation
+  - Footer with links and social media
+- [ ] Homepage:
+  - banner carousel
+  - latest products
+- [ ] Products Catalog:
+  - Sidebar with categories and filters
+  - Search results
+  - Product grid
+  - Pagination
+- [ ] Product pages:
+  - Create product detail page layout
+  - Implement image gallery with thumbnails
+  - Add product information section:
+    - Title, price, description
+    - Stock status
+    - Add to cart button
+  - Reviews and ratings section:
+    - Display existing reviews
+    - Add review form for authenticated users
+    - Star rating component
+  - Related products section:
+    - Show products from same category
+    - Product card carousel
+- [ ] Shopping cart:
+  - Add/remove items
+  - Update quantities
+  - Cart persistence
+- [ ] Checkout process:
+  - Shipping information
+  - Payment integration (Stripe)
+  - Order confirmation
+- [ ] User dashboard:
+  - Order history
+  - Profile management
+  - Saved addresses
+  - Wishlist
+
 
 ### 4. Admin Dashboard [ ]
 
