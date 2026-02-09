@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { addToCart } from "@/app/actions/cart"
+import { useGuestCartStore } from "@/lib/store/guest-cart"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -25,24 +27,36 @@ export function ProductInfoActionsClient({
   isAuthenticated,
 }: ProductInfoActionsClientProps) {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
-  const [message, setMessage] = useState<string>("")
+  const [status, setStatus] = useState<"idle" | "loading">("idle")
+  const router = useRouter()
+  const addGuestItem = useGuestCartStore((s) => s.addItem)
 
   const maxQty = Math.max(1, stock)
   const options = Array.from({ length: maxQty }, (_, i) => i + 1)
 
+  function showAddedToast() {
+    toast.success("Added to cart", {
+      action: {
+        label: "View cart",
+        onClick: () => router.push("/cart"),
+      },
+    })
+  }
+
   async function handleAddToCart() {
-    if (!isAuthenticated) return
     setStatus("loading")
-    setMessage("")
-    const result = await addToCart(productId, quantity)
-    if (result.ok) {
-      setStatus("success")
-      setMessage("Added to cart.")
+    if (isAuthenticated) {
+      const result = await addToCart(productId, quantity)
+      if (result.ok) {
+        showAddedToast()
+      } else {
+        toast.error(result.error)
+      }
     } else {
-      setStatus("error")
-      setMessage(result.error)
+      addGuestItem(productId, quantity)
+      showAddedToast()
     }
+    setStatus("idle")
   }
 
   return (
@@ -54,7 +68,7 @@ export function ProductInfoActionsClient({
         <Select
           value={String(quantity)}
           onValueChange={(v) => setQuantity(Number(v))}
-          disabled={stock <= 0 || !isAuthenticated}
+          disabled={stock <= 0}
         >
           <SelectTrigger
             id="quantity"
@@ -81,33 +95,13 @@ export function ProductInfoActionsClient({
         {stock > 0 ? "In stock" : "Out of stock"}
       </p>
       <div className="pt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-        {isAuthenticated ? (
-          <Button
-            onClick={handleAddToCart}
-            disabled={status === "loading" || stock <= 0}
-            className="w-full rounded-md bg-black px-6 py-2.5 text-sm font-normal text-white hover:bg-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800"
-          >
-            {status === "loading" ? "Adding…" : "Add to Cart"}
-          </Button>
-        ) : (
-          <Button
-            asChild
-            className="w-full rounded-md bg-black px-6 py-2.5 text-sm font-normal text-white hover:bg-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800"
-          >
-            <Link href="/login">Sign in to add to cart</Link>
-          </Button>
-        )}
-        {isAuthenticated && message && (
-          <span
-            className={
-              status === "error"
-                ? "text-sm text-destructive"
-                : "text-sm text-muted-foreground"
-            }
-          >
-            {message}
-          </span>
-        )}
+        <Button
+          onClick={handleAddToCart}
+          disabled={status === "loading" || stock <= 0}
+          className="w-full rounded-md bg-black px-6 py-2.5 text-sm font-normal text-white hover:bg-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800"
+        >
+          {status === "loading" ? "Adding…" : "Add to Cart"}
+        </Button>
       </div>
     </div>
   )

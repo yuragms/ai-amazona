@@ -78,10 +78,10 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
   - Related products section:
     - Show products from same category
     - Product card carousel
-- [ ] Shopping cart:
+- [x] Shopping cart:
   - Add/remove items
   - Update quantities
-  - Cart persistence
+  - Cart persistence (DB for authenticated users)
 - [ ] Checkout process:
   - Shipping information
   - Payment integration (Stripe)

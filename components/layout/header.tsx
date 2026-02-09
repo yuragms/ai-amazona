@@ -5,9 +5,22 @@ import { useRouter } from "next/navigation"
 import { ShoppingCart, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { GuestCartCount } from "@/components/cart/guest-cart-count"
+import { useGuestCartStore } from "@/lib/store/guest-cart"
 
-export function Header() {
+type HeaderProps = {
+  cartCount?: number
+  isAuthenticated?: boolean
+}
+
+export function Header({ cartCount = 0, isAuthenticated = false }: HeaderProps) {
   const router = useRouter()
+  const guestCount = useGuestCartStore((s) =>
+    s.items.reduce((n, i) => n + i.quantity, 0)
+  )
+  const showGuestCount = !isAuthenticated
+  const showAuthCount = isAuthenticated && cartCount > 0
+  const cartAriaCount = isAuthenticated ? cartCount : guestCount
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -58,10 +71,20 @@ export function Header() {
         <div className="flex shrink-0 items-center gap-4">
           <Link
             href="/cart"
-            className="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Shopping cart"
+            className="relative flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={
+              cartAriaCount > 0
+                ? `Shopping cart, ${cartAriaCount} items`
+                : "Shopping cart"
+            }
           >
             <ShoppingCart className="size-5" />
+            {showAuthCount && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+            {showGuestCount && <GuestCartCount />}
           </Link>
           <Button variant="default" size="sm" asChild>
             <Link href="/login">Sign In</Link>
