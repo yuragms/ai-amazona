@@ -1,3 +1,5 @@
+import { DevLoginButton } from "@/components/auth/dev-login-button"
+
 export default function LoginPage() {
   return (
     <main className="w-full max-w-sm p-6">
@@ -5,6 +7,7 @@ export default function LoginPage() {
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
         Auth form will go here.
       </p>
+      <DevLoginButton />
     </main>
-  );
+  )
 }

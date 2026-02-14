@@ -25,6 +25,12 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - `AUTH_SECRET` — обязателен (например, `npx auth secret`).
 - OAuth (опционально): `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` — для входа через Google и GitHub.
 
+### Stripe (Checkout)
+
+- `STRIPE_SECRET_KEY` — секретный ключ Stripe (sk_test_… или sk_live_…).
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — публичный ключ для Stripe Elements на странице checkout.
+- `STRIPE_WEBHOOK_SECRET` — подпись webhook (whsec_…) для маршрута `POST /api/webhooks/stripe`. В разработке: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

@@ -2,19 +2,29 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ShoppingCart, Search } from "lucide-react"
+import { signOut, useSession } from "next-auth/react"
+import { LayoutDashboard, LogOut, Package, Search, ShoppingCart, User, UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { GuestCartCount } from "@/components/cart/guest-cart-count"
 import { useGuestCartStore } from "@/lib/store/guest-cart"
 
 type HeaderProps = {
   cartCount?: number
-  isAuthenticated?: boolean
 }
 
-export function Header({ cartCount = 0, isAuthenticated = false }: HeaderProps) {
+export function Header({ cartCount = 0 }: HeaderProps) {
   const router = useRouter()
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === "authenticated" && !!session?.user
+
   const guestCount = useGuestCartStore((s) =>
     s.items.reduce((n, i) => n + i.quantity, 0)
   )
@@ -86,9 +96,55 @@ export function Header({ cartCount = 0, isAuthenticated = false }: HeaderProps) 
             )}
             {showGuestCount && <GuestCartCount />}
           </Link>
-          <Button variant="default" size="sm" asChild>
-            <Link href="/login">Sign In</Link>
-          </Button>
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="User menu"
+                >
+                  <User className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="size-4" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/orders">
+                    <Package className="size-4" />
+                    My Orders
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <UserCircle className="size-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    signOut({ callbackUrl: "/" })
+                  }}
+                >
+                  <LogOut className="size-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="default" size="sm" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

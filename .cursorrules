@@ -82,10 +82,10 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
   - Add/remove items
   - Update quantities
   - Cart persistence (DB for authenticated users)
-- [ ] Checkout process:
-  - Shipping information
-  - Payment integration (Stripe)
-  - Order confirmation
+- [x] Checkout process:
+  - Shipping information (addresses + form)
+  - Payment integration (Stripe Checkout Session + webhook)
+  - Order confirmation (success page)
 - [ ] User dashboard:
   - Order history
   - Profile management

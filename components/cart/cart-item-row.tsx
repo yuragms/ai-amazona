@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Trash2 } from "lucide-react"
 import { updateCartItemQuantity, removeFromCart } from "@/app/actions/cart"
-import type { CartItemWithProduct } from "@/app/actions/cart"
+import type { CartItemSerialized } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select"
 
 type CartItemRowProps = {
-  item: CartItemWithProduct
+  item: CartItemSerialized
 }
 
 export function CartItemRow({ item }: CartItemRowProps) {
@@ -24,7 +24,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState("")
 
-  const price = Number(item.product.price)
+  const price = item.product.price
   const lineTotal = price * quantity
   const maxQty = Math.max(1, item.product.stock)
   const options = Array.from({ length: maxQty }, (_, i) => i + 1)

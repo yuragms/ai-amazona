@@ -21,6 +21,20 @@ export type CartItemWithProduct = {
   }
 }
 
+/** Сериализованный элемент корзины (price как number для передачи в Client Components) */
+export type CartItemSerialized = {
+  id: string
+  quantity: number
+  product: {
+    id: string
+    name: string
+    slug: string
+    price: number
+    images: string[]
+    stock: number
+  }
+}
+
 export async function addToCart(productId: string, quantity: number = 1): Promise<AddToCartResult> {
   const session = await auth()
   if (!session?.user?.id) {

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { auth } from "@/auth"
-import { getCartItems } from "@/app/actions/cart"
+import { getCartItems, type CartItemSerialized } from "@/app/actions/cart"
 import { CartItemRow } from "@/components/cart/cart-item-row"
 import { EmptyCartState } from "@/components/cart/empty-cart-state"
 import { GuestCartContent } from "@/components/cart/guest-cart-content"
@@ -20,8 +20,21 @@ export default async function CartPage() {
     return <EmptyCartState />
   }
 
-  const total = safeItems.reduce(
-    (sum, it) => sum + Number(it.product.price) * it.quantity,
+  const serializedItems: CartItemSerialized[] = safeItems.map((item) => ({
+    id: item.id,
+    quantity: item.quantity,
+    product: {
+      id: item.product.id,
+      name: item.product.name,
+      slug: item.product.slug,
+      price: Number(item.product.price),
+      images: item.product.images,
+      stock: item.product.stock,
+    },
+  }))
+
+  const total = serializedItems.reduce(
+    (sum, it) => sum + it.product.price * it.quantity,
     0
   )
 
@@ -30,7 +43,7 @@ export default async function CartPage() {
       <div className="w-full rounded-lg border border-border bg-white p-6 shadow-sm sm:p-8">
         <h1 className="text-2xl font-bold text-foreground">Shopping Cart</h1>
         <div className="mt-6 divide-y divide-border">
-          {safeItems.map((item) => (
+          {serializedItems.map((item) => (
             <CartItemRow key={item.id} item={item} />
           ))}
         </div>

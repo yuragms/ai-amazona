@@ -11,7 +11,7 @@ export default async function HomeLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header cartCount={cartCount} isAuthenticated={!!session?.user} />
+      <Header cartCount={cartCount} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>
