@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -101,14 +102,30 @@ export function Header({ cartCount = 0 }: HeaderProps) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="rounded-full"
+                  className="flex items-center gap-2 rounded-full px-2 py-1.5"
                   aria-label="User menu"
                 >
-                  <User className="size-5" />
+                  <User className="size-5 shrink-0" />
+                  <span className="max-w-[120px] truncate text-left text-sm font-medium md:max-w-[160px]">
+                    {session.user.name || session.user.email || "Account"}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col gap-0.5">
+                    {session.user.name && (
+                      <p className="text-sm font-medium leading-none">{session.user.name}</p>
+                    )}
+                    {session.user.email && (
+                      <p className="text-xs text-muted-foreground">{session.user.email}</p>
+                    )}
+                    {!session.user.name && !session.user.email && (
+                      <p className="text-sm text-muted-foreground">Account</p>
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">
                     <LayoutDashboard className="size-4" />
@@ -116,13 +133,13 @@ export function Header({ cartCount = 0 }: HeaderProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/orders">
+                  <Link href="/dashboard/orders">
                     <Package className="size-4" />
                     My Orders
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
+                  <Link href="/dashboard/profile">
                     <UserCircle className="size-4" />
                     Profile
                   </Link>

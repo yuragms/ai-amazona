@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db"
 import { CatalogSidebar } from "@/components/catalog/catalog-sidebar"
 import { ProductCard } from "@/components/catalog/product-card"
 import { CatalogPagination } from "@/components/catalog/catalog-pagination"
+import { ClearSearch } from "@/components/catalog/clear-search"
 
 const PAGE_SIZE = 12
 
@@ -102,9 +103,14 @@ export default async function ProductsCatalogPage({
 
         <div className="min-w-0 flex-1">
           <header className="mb-4">
-            <h1 className="text-2xl font-semibold text-foreground">
-              {q ? `Search: "${q}"` : "Products"}
-            </h1>
+            <div className="flex flex-wrap items-center gap-1">
+              <h1 className="text-2xl font-semibold text-foreground">
+                {q ? `Search: "${q}"` : "Products"}
+              </h1>
+              <Suspense fallback={null}>
+                <ClearSearch />
+              </Suspense>
+            </div>
             <p className="mt-1 text-sm text-muted-foreground">
               {total} {total === 1 ? "product" : "products"} found
             </p>

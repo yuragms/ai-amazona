@@ -10,6 +10,26 @@ export type OrderConfirmation = {
   createdAt: Date
 }
 
+export type OrderListItem = OrderConfirmation
+
+export async function getOrdersList(): Promise<OrderListItem[] | null> {
+  const session = await auth()
+  if (!session?.user?.id) return null
+
+  const orders = await prisma.order.findMany({
+    where: { userId: session.user.id },
+    select: { id: true, status: true, total: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  })
+
+  return orders.map((o) => ({
+    id: o.id,
+    status: o.status,
+    total: Number(o.total),
+    createdAt: o.createdAt,
+  }))
+}
+
 export type OrderItemDetail = {
   id: string
   productName: string
