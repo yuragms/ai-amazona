@@ -22,7 +22,7 @@ async function main() {
   const adminPassword = await hash("admin123", 12);
   const admin = await prisma.user.upsert({
     where: { email: "admin@example.com" },
-    update: {},
+    update: { password: adminPassword },
     create: {
       email: "admin@example.com",
       name: "Admin User",
@@ -132,11 +132,63 @@ async function main() {
     },
   ];
 
-  for (const p of products) {
-    await prisma.product.create({ data: p });
+  const createdProducts = await Promise.all(
+    products.map((p) => prisma.product.create({ data: p }))
+  );
+
+  console.log("Created", createdProducts.length, "products");
+
+  // Create 100 orders with at least 3 order items each
+  const orderStatuses = [
+    "PAID",
+    "PAID",
+    "PAID",
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED",
+    "DELIVERED",
+    "PENDING",
+    "CANCELLED",
+    "REFUNDED",
+  ] as const;
+
+  const now = new Date();
+  for (let i = 0; i < 100; i++) {
+    // Pick 3–6 random products (no duplicates per order)
+    const itemCount = 3 + Math.floor(Math.random() * 4);
+    const shuffled = [...createdProducts].sort(() => Math.random() - 0.5);
+    const selectedProducts = shuffled.slice(0, itemCount);
+
+    let total = 0;
+    const orderItems = selectedProducts.map((product) => {
+      const quantity = 1 + Math.floor(Math.random() * 3);
+      const priceAtPurchase = Number(product.price);
+      total += priceAtPurchase * quantity;
+      return {
+        productId: product.id,
+        quantity,
+        priceAtPurchase,
+      };
+    });
+
+    const status = orderStatuses[i % orderStatuses.length];
+    const daysAgo = Math.floor(Math.random() * 90);
+    const createdAt = new Date(now);
+    createdAt.setDate(createdAt.getDate() - daysAgo);
+
+    await prisma.order.create({
+      data: {
+        userId: user.id,
+        status,
+        total,
+        createdAt,
+        updatedAt: createdAt,
+        orderItems: { create: orderItems },
+      },
+    });
   }
 
-  console.log("Created", products.length, "products");
+  console.log("Created 100 orders with 3–6 items each");
 }
 
 main()

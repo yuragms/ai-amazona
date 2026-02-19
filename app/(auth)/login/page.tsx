@@ -1,13 +1,11 @@
-import { DevLoginButton } from "@/components/auth/dev-login-button"
+import { ParticlesBackground } from "@/components/auth/particles-background"
+import { LoginForm } from "@/components/auth/login-form"
 
 export default function LoginPage() {
   return (
-    <main className="w-full max-w-sm p-6">
-      <h1 className="text-2xl font-semibold">Sign in</h1>
-      <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-        Auth form will go here.
-      </p>
-      <DevLoginButton />
+    <main className="relative flex min-h-screen w-full items-center justify-center p-6">
+      <ParticlesBackground />
+      <LoginForm />
     </main>
   )
 }

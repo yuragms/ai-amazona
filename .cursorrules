@@ -34,7 +34,7 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 - [x] Install Zustand for client state (cart, UI)
 - [x] Install Recharts for admin charts
 - [x] Install Resend SDK for transactional emails
-- [ ] Set up Uploadthing (app + API route) for product images
+- [x] Set up Uploadthing (app + API route) for product images
 - [x] Install Prisma, configure PostgreSQL (DATABASE_URL)
 - [x] Install next-auth@beta (v5), configure auth route and session
 - [ ] Install Stripe (server + client), set webhook route
@@ -95,26 +95,95 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 
 ### 4. Admin Dashboard [ ]
 
-- [ ] **Layout:** `app/(admin)/admin/layout` — sidebar nav (Lucide icons), restrict to `role === 'admin'`
-- [ ] **Overview:** Recharts — revenue over time (line), orders (bar), key metrics cards (total revenue, orders, customers, AOV); data from Prisma aggregates
-- [ ] **Products:** CRUD table (Shadcn Table), create/edit form with Zod; images via Uploadthing
-- [ ] **Orders:** List orders, filters (status, date), detail view, status updates
-- [ ] **Users:** List users, toggle admin (if applicable)
-- [ ] **Low stock / reports:** Optional — low stock list, export (CSV) using Recharts/data from Prisma
+- [x] Admin authentication and authorization
+- [x] Dashboard overview:
+  - [x] Layout and Structure:
+    - [x] Create admin dashboard layout with sidebar navigation
+    - [x] Implement responsive grid for dashboard widgets
+    - [x] Add loading states and error boundaries
+  - [x] Key Metrics Cards:
+    - [x] Total revenue widget with real data
+    - [x] Total orders widget with real data
+    - [x] Total customers widget with real data
+    - [x] Average order value widget with real data
+  - [x] Sales Analytics:
+    - [x] Revenue Chart:
+      - [x] Implement line chart using Recharts
+      - [x] Add daily/weekly/monthly/yearly filters (7d/30d/90d)
+      - [x] Show revenue trends over time
+      - [x] Add tooltip with detailed information
+    - [x] Order Statistics:
+      - [x] Bar chart for order volume
+      - [x] Order status distribution
+      - [ ] Peak ordering times
+  - [x] Recent Orders Table:
+    - [x] Implement data table with columns:
+      - [x] Order ID
+      - [x] Customer name
+      - [x] Order total
+      - [x] Status
+      - [x] Date
+    - [ ] Add sorting and filtering
+    - [x] Quick actions (view)
+  - [x] Low Stock Alerts:
+    - [x] Products with stock below threshold
+    - [ ] Quick restock actions
+    - [x] Stock level indicators
+  - [x] Top Products:
+    - [x] Best-selling products list
+    - [x] Revenue by product
+    - [x] Stock status
+  - [x] Customer Insights:
+    - [x] New vs returning customers
+    - [x] Customer acquisition chart
+    - [x] Top customers by revenue
+  - [x] Real-time Updates:
+    - [x] Live data via polling (router.refresh every 30s)
+    - [x] Live order notifications (toast when order count increases)
+    - [x] Stock level updates (toast when low stock count increases)
+  - [x] Export and Reports:
+    - [x] CSV/PDF export functionality (CSV download, Print / Save as PDF)
+    - [x] Custom date range selection (from/to + presets: 7d, 30d, 90d)
+    - [x] Report generation (summary + orders table for range)
+- [x] Product management:
+  - [x] CRUD operations (create, edit, delete product)
+  - [x] Bulk actions (select rows, bulk delete)
+  - [x] Image upload (Uploadthing: app/api/uploadthing, productImage route)
+- [x] Order management:
+  - [x] Order processing (list with filters: status, date range)
+  - [x] Status updates (per-row and in detail view)
+  - [x] Order detail view (items, shipping address, status change)
+  - [ ] Refund handling (Stripe integration)
+- [x] User management:
+  - [x] Customer list (table: name, email, role, order count, joined date)
+  - [x] Admin privileges (toggle role USER/ADMIN per user; cannot remove own admin)
+  - [x] User actions (update role via dropdown)
 
-### 5. Emails and Payments [ ]
+### 5. Advanced Features [ ]
 
-- [ ] Resend: Order confirmation, shipping update, password reset (if using credentials); use Server Actions or API routes
-- [ ] Stripe: Checkout Session creation, webhook for `checkout.session.completed` / `payment_intent.succeeded` — create Order and OrderItems, update inventory
-- [ ] Store Stripe customer/session IDs if needed for receipts or portal
+- [ ] Real-time notifications
+- [ ] Email system (Resend):
+  - Order confirmations
+  - Shipping updates
+  - Password reset
+- [ ] Search optimization
+- [ ] Performance optimization:
+  - Image optimization
+  - Caching strategies
+  - API optimization
+- [ ] Analytics and reporting
 
-### 6. Polish and Deploy [ ]
+### 6. Testing and Deployment [ ]
 
-- [ ] Loading and error states (Shadcn skeletons, error boundaries)
-- [ ] SEO: metadata, Open Graph for product pages
-- [ ] Security: validate all inputs with Zod, rate limit auth/checkout, secure env
-- [ ] Deploy: Vercel (or other), PostgreSQL (e.g. Neon/Supabase), set env for Stripe webhook, Resend, Uploadthing, NextAuth URL
-- [ ] Optional: tests (e.g. Vitest + Playwright), CI (lint, typecheck, build)
+- [ ] Unit testing
+- [ ] Integration testing
+- [ ] E2E testing
+- [ ] Security audit
+- [ ] Production deployment:
+  - Environment setup
+  - CI/CD pipeline
+  - Monitoring
+  - Backup strategy
 
 ### 7. Documentation [ ]
 

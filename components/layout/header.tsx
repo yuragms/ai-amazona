@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
-import { LayoutDashboard, LogOut, Package, Search, ShoppingCart, User, UserCircle } from "lucide-react"
+import { LayoutDashboard, LogOut, Package, Search, Shield, ShoppingCart, User, UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -144,6 +144,14 @@ export function Header({ cartCount = 0 }: HeaderProps) {
                     Profile
                   </Link>
                 </DropdownMenuItem>
+                {session.user.role === "ADMIN" && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">
+                      <Shield className="size-4" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"

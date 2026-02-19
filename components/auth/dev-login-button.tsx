@@ -24,7 +24,7 @@ export function DevLoginButton() {
       type="button"
       variant="outline"
       onClick={handleDevLogin}
-      className="mt-4 border-amber-500/50 text-amber-700 dark:text-amber-400"
+      className="mt-4 w-full border-amber-500/50 text-amber-700 dark:text-amber-400"
     >
       Войти как тестовый пользователь (user@example.com)
     </Button>
