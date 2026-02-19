@@ -3,7 +3,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/db"
 import { revalidatePath } from "next/cache"
-import type { OrderStatus } from "@prisma/client"
+import type { OrderStatus, Prisma } from "@prisma/client"
 import { ORDER_STATUSES } from "@/lib/order-constants"
 
 export type AdminOrderListItem = {
@@ -29,7 +29,7 @@ export async function getAdminOrders(
     return []
   }
 
-  const where: Parameters<typeof prisma.order.findMany>[0]["where"] = {}
+  const where: Prisma.OrderWhereInput = {}
   if (filters?.status && filters.status !== "ALL") {
     where.status = filters.status
   }

@@ -47,7 +47,7 @@ export function OrdersFilters() {
     const dateFromVal = (form.elements.namedItem("dateFrom") as HTMLInputElement)?.value ?? ""
     const dateToVal = (form.elements.namedItem("dateTo") as HTMLInputElement)?.value ?? ""
     apply({
-      status: status === "ALL" ? undefined : status,
+      status: status === "ALL" ? undefined : (status as AdminOrderFilters["status"]),
       dateFrom: dateFromVal || undefined,
       dateTo: dateToVal || undefined,
     })
@@ -61,7 +61,7 @@ export function OrdersFilters() {
           value={status}
           onValueChange={(v) =>
             apply({
-              status: v === "ALL" ? "ALL" : v,
+              status: v === "ALL" ? "ALL" : (v as AdminOrderFilters["status"]),
               dateFrom: dateFrom || undefined,
               dateTo: dateTo || undefined,
             })

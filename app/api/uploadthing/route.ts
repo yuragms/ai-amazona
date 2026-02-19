@@ -1,5 +1,5 @@
 import { createRouteHandler } from "uploadthing/next"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { readFileSync, existsSync } from "fs"
 import { join } from "path"
 import { ourFileRouter } from "./core"
@@ -111,7 +111,7 @@ async function errorResponse(message: string) {
   )
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const tokenValidation = validateToken()
   if (!tokenValidation.ok) {
     return errorResponse(tokenValidation.message)
@@ -129,7 +129,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const tokenValidation = validateToken()
   if (!tokenValidation.ok) {
     return errorResponse(tokenValidation.message)
