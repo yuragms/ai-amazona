@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
@@ -16,15 +17,23 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { GuestCartCount } from "@/components/cart/guest-cart-count"
 import { useGuestCartStore } from "@/lib/store/guest-cart"
+import { getCartCount } from "@/app/actions/cart"
 
-type HeaderProps = {
-  cartCount?: number
-}
-
-export function Header({ cartCount = 0 }: HeaderProps) {
+export function Header() {
   const router = useRouter()
   const { data: session, status } = useSession()
+  const [cartCount, setCartCount] = useState(0)
   const isAuthenticated = status === "authenticated" && !!session?.user
+
+  useEffect(() => {
+    if (isAuthenticated) getCartCount().then(setCartCount)
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    const refetch = () => isAuthenticated && getCartCount().then(setCartCount)
+    window.addEventListener("cart-updated", refetch)
+    return () => window.removeEventListener("cart-updated", refetch)
+  }, [isAuthenticated])
 
   const guestCount = useGuestCartStore((s) =>
     s.items.reduce((n, i) => n + i.quantity, 0)

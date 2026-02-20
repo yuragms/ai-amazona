@@ -37,8 +37,9 @@ export function WishlistActions({
 
   async function handleAddToCart() {
     setAddingToCart(true)
-    await addToCart(productId, 1)
+    const result = await addToCart(productId, 1)
     setAddingToCart(false)
+    if (result?.ok) window.dispatchEvent(new Event("cart-updated"))
     router.refresh()
   }
 

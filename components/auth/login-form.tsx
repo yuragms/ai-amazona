@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,10 +23,12 @@ type RoleOption = "USER" | "ADMIN"
 
 export function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [mode, setMode] = useState<Mode>("login")
   const [role, setRole] = useState<RoleOption>("USER")
   const [formError, setFormError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
+  const resetSuccess = searchParams.get("reset") === "ok"
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -164,7 +166,17 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Пароль</Label>
+              {mode === "login" && (
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-muted-foreground underline hover:text-foreground"
+                >
+                  Забыли пароль?
+                </Link>
+              )}
+            </div>
             <Input
               id="password"
               name="password"
@@ -175,6 +187,11 @@ export function LoginForm() {
             />
           </div>
 
+          {resetSuccess && (
+            <p className="text-sm text-green-600 dark:text-green-400" role="status">
+              Пароль успешно изменён. Войдите с новым паролем.
+            </p>
+          )}
           {errorMessage && (
             <p className="text-sm text-destructive" role="alert">
               {errorMessage}

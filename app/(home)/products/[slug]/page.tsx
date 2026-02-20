@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { prisma } from "@/lib/db"
+import { getCachedProductBySlug, getCachedRelatedProducts } from "@/lib/cached-queries"
 import { ProductGallery } from "@/components/product/product-gallery"
 import { ProductInfo } from "@/components/product/product-info"
 import { ReviewsSection } from "@/components/product/reviews-section"
@@ -11,10 +11,7 @@ type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    select: { name: true, description: true, images: true },
-  })
+  const product = await getCachedProductBySlug(slug)
   if (!product) return { title: "Product | Amazona" }
   const image = product.images[0]
   return {
@@ -28,37 +25,14 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params
   const session = await auth()
 
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      category: { select: { id: true, name: true, slug: true } },
-      reviews: {
-        select: {
-          id: true,
-          rating: true,
-          body: true,
-          createdAt: true,
-          user: { select: { name: true, image: true } },
-        },
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  })
-
+  const product = await getCachedProductBySlug(slug)
   if (!product) notFound()
 
-  const relatedRows = await prisma.product.findMany({
-    where: {
-      categoryId: product.categoryId,
-      id: { not: product.id },
-    },
-    take: 8,
-    include: {
-      category: { select: { id: true, name: true, slug: true } },
-      reviews: { select: { rating: true } },
-    },
-  })
-  const relatedProducts = relatedRows.map((p) => ({
+  const relatedProductsData = await getCachedRelatedProducts(
+    product.categoryId,
+    product.id
+  )
+  const relatedProducts = relatedProductsData.map((p) => ({
     ...p,
     price: Number(p.price),
   }))

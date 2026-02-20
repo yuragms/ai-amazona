@@ -6,6 +6,7 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { AdminSidebarMobile } from "@/components/admin/admin-sidebar-mobile"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { AdminNotificationBell } from "@/components/admin/admin-notification-bell"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 export function AdminLayoutClient({
@@ -37,12 +38,15 @@ export function AdminLayoutClient({
           >
             <span className="text-xl">Al Amazona</span>
           </Link>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/" className="ml-auto gap-2">
+          <div className="ml-auto flex items-center gap-2">
+            <AdminNotificationBell />
+            <Button variant="ghost" size="sm" asChild>
+            <Link href="/" className="gap-2">
               <ArrowLeft className="size-4" />
               <span className="hidden sm:inline">Back to store</span>
             </Link>
           </Button>
+          </div>
         </header>
         <main className="flex-1 p-4 lg:p-6">{children}</main>
       </div>

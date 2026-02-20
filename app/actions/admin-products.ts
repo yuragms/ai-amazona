@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/db"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 import { z } from "zod"
 
 const productSchema = z.object({
@@ -91,6 +91,7 @@ export async function createProduct(
     },
   })
 
+  revalidateTag("catalog", "max")
   revalidatePath("/admin/products")
   revalidatePath("/products")
   return { ok: true, id: product.id }
@@ -146,6 +147,9 @@ export async function updateProduct(
   revalidatePath("/admin/products")
   revalidatePath("/products")
   revalidatePath(`/products/${parsed.data.slug}`)
+  revalidateTag(`product-${parsed.data.slug}`, "max")
+  revalidateTag("product", "max")
+  revalidateTag("catalog", "max")
   return { ok: true }
 }
 
@@ -154,7 +158,16 @@ export async function deleteProduct(productId: string): Promise<{ ok: boolean; e
   if (!session?.user?.id || session.user.role !== "ADMIN") {
     return { ok: false, error: "Unauthorized" }
   }
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { slug: true },
+  })
   await prisma.product.delete({ where: { id: productId } })
+  if (product) {
+    revalidateTag(`product-${product.slug}`, "max")
+  }
+  revalidateTag("product", "max")
+  revalidateTag("catalog", "max")
   revalidatePath("/admin/products")
   revalidatePath("/products")
   return { ok: true }
@@ -171,6 +184,8 @@ export async function deleteProductsBulk(
   const result = await prisma.product.deleteMany({
     where: { id: { in: productIds } },
   })
+  revalidateTag("product", "max")
+  revalidateTag("catalog", "max")
   revalidatePath("/admin/products")
   revalidatePath("/products")
   return { ok: true, deleted: result.count }

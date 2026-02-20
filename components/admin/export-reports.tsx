@@ -107,6 +107,16 @@ export function ExportReports() {
             <p><strong>Total Orders:</strong> ${report.totalOrders}</p>
             <p><strong>Average Order Value:</strong> $${report.averageOrderValue.toFixed(2)}</p>
           </div>
+          ${report.salesByCategory.length > 0 ? `
+          <h2>Sales by category</h2>
+          <table>
+            <thead><tr><th>Category</th><th>Revenue</th><th>Units</th></tr></thead>
+            <tbody>
+              ${report.salesByCategory.map((r) => `<tr><td>${r.categoryName}</td><td>$${r.revenue.toFixed(2)}</td><td>${r.orderCount}</td></tr>`).join("")}
+            </tbody>
+          </table>
+          ` : ""}
+          <h2>Orders</h2>
           <table>
             <thead><tr>
               <th>Order ID</th><th>Date</th><th>Customer</th><th>Status</th><th>Total</th>
@@ -231,6 +241,21 @@ export function ExportReports() {
                 {report.averageOrderValue.toFixed(2)}
               </li>
             </ul>
+            {report.salesByCategory.length > 0 && (
+              <div className="mt-3">
+                <h4 className="text-sm font-medium mb-2">Sales by category</h4>
+                <ul className="text-sm space-y-1">
+                  {report.salesByCategory.map((row) => (
+                    <li key={row.categoryName} className="flex justify-between gap-4">
+                      <span>{row.categoryName}</span>
+                      <span>
+                        ${row.revenue.toFixed(2)} ({row.orderCount} units)
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {report.orders.length > 0 && (
               <p className="text-sm text-muted-foreground">
                 {report.orders.length} order(s) in range.

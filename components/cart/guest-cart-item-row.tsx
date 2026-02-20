@@ -47,6 +47,7 @@ export function GuestCartItemRow({
             alt={product.name}
             fill
             className="object-cover"
+            quality={65}
             sizes="96px"
           />
         ) : (

@@ -1,17 +1,12 @@
-import { auth } from "@/auth"
-import { getCartCount } from "@/app/actions/cart"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 
-export default async function HomeLayout({
+export default function HomeLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await auth()
-  const cartCount = session?.user ? await getCartCount() : 0
-
   return (
     <div className="flex min-h-screen flex-col">
-      <Header cartCount={cartCount} />
+      <Header />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

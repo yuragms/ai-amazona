@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/db"
+import { sendShippingUpdate } from "@/lib/email"
 import { revalidatePath } from "next/cache"
 import type { OrderStatus, Prisma } from "@prisma/client"
 import { ORDER_STATUSES } from "@/lib/order-constants"
@@ -151,6 +152,33 @@ export async function updateOrderStatus(
     where: { id: orderId },
     data: { status },
   })
+
+  if (status === "SHIPPED") {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { email: true, name: true } },
+        shippingAddress: true,
+      },
+    })
+    if (order?.user?.email && order.shippingAddress) {
+      const address = [
+        order.shippingAddress.street,
+        order.shippingAddress.city,
+        order.shippingAddress.state,
+        order.shippingAddress.postalCode,
+        order.shippingAddress.country,
+      ]
+        .filter(Boolean)
+        .join(", ")
+      await sendShippingUpdate({
+        to: order.user.email,
+        userName: order.user.name ?? order.user.email,
+        orderId: order.id,
+        address,
+      })
+    }
+  }
 
   revalidatePath("/admin/orders")
   revalidatePath("/admin")

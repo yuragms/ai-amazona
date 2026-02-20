@@ -2,7 +2,10 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/db"
+import { unstable_cache } from "next/cache"
+
 const LOW_STOCK_THRESHOLD = 10
+const ADMIN_METRICS_REVALIDATE = 30
 
 function subDays(date: Date, days: number): Date {
   const d = new Date(date)
@@ -16,29 +19,49 @@ export async function getDashboardMetrics() {
     return null
   }
 
-  const [totalRevenue, totalOrders, totalCustomers, lowStockCount] =
-    await Promise.all([
-      prisma.order.aggregate({
-        where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
-        _sum: { total: true },
-      }),
-      prisma.order.count({
-        where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
-      }),
-      prisma.user.count({ where: { role: "USER" } }),
-      prisma.product.count({ where: { stock: { lt: LOW_STOCK_THRESHOLD } } }),
-    ])
+  return unstable_cache(
+    async () => {
+      const [totalRevenue, totalOrders, totalCustomers, lowStockCount] =
+        await Promise.all([
+          prisma.order.aggregate({
+            where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
+            _sum: { total: true },
+          }),
+          prisma.order.count({
+            where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
+          }),
+          prisma.user.count({ where: { role: "USER" } }),
+          prisma.product.count({ where: { stock: { lt: LOW_STOCK_THRESHOLD } } }),
+        ])
+      const revenue = Number(totalRevenue._sum.total ?? 0)
+      const aov = totalOrders > 0 ? revenue / totalOrders : 0
+      return {
+        totalRevenue: revenue,
+        totalOrders,
+        totalCustomers,
+        averageOrderValue: aov,
+        lowStockCount,
+      }
+    },
+    ["admin-dashboard-metrics"],
+    { revalidate: ADMIN_METRICS_REVALIDATE }
+  )()
+}
 
-  const revenue = Number(totalRevenue._sum.total ?? 0)
-  const aov = totalOrders > 0 ? revenue / totalOrders : 0
+export type LiveMetrics = { orderCount: number; lowStockCount: number }
 
-  return {
-    totalRevenue: revenue,
-    totalOrders,
-    totalCustomers,
-    averageOrderValue: aov,
-    lowStockCount,
+export async function getAdminLiveMetrics(): Promise<LiveMetrics | null> {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return null
   }
+  const [orderCount, lowStockCount] = await Promise.all([
+    prisma.order.count({
+      where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
+    }),
+    prisma.product.count({ where: { stock: { lt: LOW_STOCK_THRESHOLD } } }),
+  ])
+  return { orderCount, lowStockCount }
 }
 
 export type RevenueDataPoint = { date: string; revenue: number; orders: number }
@@ -82,6 +105,39 @@ export async function getRevenueChartData(period: "7d" | "30d" | "90d" = "30d") 
     .map(([date, { revenue, orders }]) => ({ date, revenue, orders }))
 }
 
+export type PeakOrderingHour = { hour: number; count: number; label: string }
+
+export async function getPeakOrderingTimes(days: number = 30): Promise<PeakOrderingHour[]> {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return []
+  }
+
+  const start = subDays(new Date(), days)
+  const orders = await prisma.order.findMany({
+    where: {
+      status: { notIn: ["CANCELLED", "REFUNDED"] },
+      createdAt: { gte: start },
+    },
+    select: { createdAt: true },
+  })
+
+  const byHour = new Map<number, number>()
+  for (let h = 0; h < 24; h++) byHour.set(h, 0)
+  for (const o of orders) {
+    const h = o.createdAt.getHours()
+    byHour.set(h, (byHour.get(h) ?? 0) + 1)
+  }
+
+  return Array.from(byHour.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([hour, count]) => ({
+      hour,
+      count,
+      label: `${hour.toString().padStart(2, "0")}:00`,
+    }))
+}
+
 export type OrderStatusCount = { status: string; count: number }
 
 export async function getOrderStatusDistribution() {
@@ -90,11 +146,17 @@ export async function getOrderStatusDistribution() {
     return []
   }
 
-  const result = await prisma.order.groupBy({
-    by: ["status"],
-    _count: { id: true },
-  })
-  return result.map((r) => ({ status: r.status, count: r._count.id }))
+  return unstable_cache(
+    async () => {
+      const result = await prisma.order.groupBy({
+        by: ["status"],
+        _count: { id: true },
+      })
+      return result.map((r) => ({ status: r.status, count: r._count.id }))
+    },
+    ["admin-order-status"],
+    { revalidate: ADMIN_METRICS_REVALIDATE }
+  )()
 }
 
 export async function getRecentOrders(limit = 10) {

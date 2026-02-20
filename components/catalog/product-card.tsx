@@ -40,7 +40,13 @@ function StarRating({ rating, reviewCount }: { rating: number; reviewCount: numb
   )
 }
 
-export function ProductCard({ product }: { product: ProductWithCategory }) {
+type ProductCardProps = {
+  product: ProductWithCategory
+  /** Set for above-the-fold images (e.g. first row on home) to improve LCP */
+  priority?: boolean
+}
+
+export function ProductCard({ product, priority }: ProductCardProps) {
   const imageSrc = product.images[0]
   const price = Number(product.price)
   const reviews = product.reviews ?? []
@@ -62,6 +68,9 @@ export function ProductCard({ product }: { product: ProductWithCategory }) {
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                quality={65}
+                priority={priority}
+                fetchPriority={priority ? "high" : undefined}
               />
             ) : (
               <div className="flex size-full items-center justify-center text-muted-foreground">

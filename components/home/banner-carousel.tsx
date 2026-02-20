@@ -54,6 +54,8 @@ export function BannerCarousel() {
                     fill
                     className="object-cover"
                     priority={i === 0}
+                    fetchPriority={i === 0 ? "high" : undefined}
+                    quality={65}
                     sizes="(min-width: 1024px) 1280px, 100vw"
                   />
                   <div className="absolute bottom-0 left-0 right-0 top-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent md:from-black/60 md:via-transparent" />

@@ -1,20 +1,15 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
-import { prisma } from "@/lib/db"
+import { getCachedCatalogCategories, getCachedCatalogProducts } from "@/lib/cached-queries"
 import { CatalogSidebar } from "@/components/catalog/catalog-sidebar"
 import { ProductCard } from "@/components/catalog/product-card"
 import { CatalogPagination } from "@/components/catalog/catalog-pagination"
 import { ClearSearch } from "@/components/catalog/clear-search"
 
-const PAGE_SIZE = 12
-
-export const metadata: Metadata = {
-  title: "Products | Amazona",
-  description: "Browse our product catalog. Filter by category, search, and find the best deals.",
-}
-
 const PRICE_MIN = 0
 const PRICE_MAX = 1000
+const PAGE_SIZE = 12
+const SEARCH_QUERY_MAX_LENGTH = 200
 
 type SearchParams = {
   q?: string
@@ -25,62 +20,50 @@ type SearchParams = {
   page?: string
 }
 
+function normalizeSearchQuery(q: string | undefined): string | undefined {
+  const t = typeof q === "string" ? q.trim() : ""
+  if (!t) return undefined
+  return t.slice(0, SEARCH_QUERY_MAX_LENGTH) || undefined
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const q = normalizeSearchQuery(params.q)
+  if (q) {
+    return {
+      title: `Search: "${q}" | Products | Amazona`,
+      description: `Search results for "${q}". Browse products and find the best deals.`,
+      openGraph: {
+        title: `Search: "${q}" | Amazona`,
+      },
+    }
+  }
+  return {
+    title: "Products | Amazona",
+    description: "Browse our product catalog. Filter by category, search, and find the best deals.",
+  }
+}
+
 export default async function ProductsCatalogPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>
 }) {
   const params = await searchParams
-  const q = typeof params.q === "string" ? params.q.trim() : undefined
+  const q = normalizeSearchQuery(params.q)
   const categorySlug = typeof params.category === "string" ? params.category.trim() : undefined
   const sort = typeof params.sort === "string" ? params.sort : "price_asc"
   const minPrice = Math.max(PRICE_MIN, parseInt(params.minPrice ?? String(PRICE_MIN), 10) || PRICE_MIN)
   const maxPrice = Math.min(PRICE_MAX, parseInt(params.maxPrice ?? String(PRICE_MAX), 10) || PRICE_MAX)
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1)
 
-  const categories = await prisma.category.findMany({
-    where: { parentId: null },
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      _count: { select: { products: true } },
-    },
-  })
-
-  const orderBy =
-    sort === "price_asc"
-      ? [{ price: "asc" as const }]
-      : sort === "price_desc"
-        ? [{ price: "desc" as const }]
-        : [{ createdAt: "desc" as const }]
-
-  const where = {
-    ...(q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" as const } },
-            { description: { contains: q, mode: "insensitive" as const } },
-          ],
-        }
-      : {}),
-    ...(categorySlug ? { category: { slug: categorySlug } } : {}),
-    price: { gte: minPrice, lte: maxPrice },
-  }
-
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      orderBy,
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      include: {
-        category: { select: { id: true, name: true, slug: true } },
-        reviews: { select: { rating: true } },
-      },
-    }),
-    prisma.product.count({ where }),
+  const [categories, { products, total }] = await Promise.all([
+    getCachedCatalogCategories(),
+    getCachedCatalogProducts({ q, categorySlug, sort, minPrice, maxPrice, page }),
   ])
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))

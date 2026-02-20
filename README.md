@@ -31,6 +31,13 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — публичный ключ для Stripe Elements на странице checkout.
 - `STRIPE_WEBHOOK_SECRET` — подпись webhook (whsec_…) для маршрута `POST /api/webhooks/stripe`. В разработке: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
 
+### Email (Resend)
+
+- `RESEND_API_KEY` — API-ключ из [Resend Dashboard](https://resend.com/api-keys). Без него письма не отправляются (подтверждение заказа, отправка заказа, сброс пароля).
+- `SENDER_EMAIL` (опционально) — адрес отправителя (по умолчанию `onboarding@resend.dev`; для продакшена нужен верифицированный домен).
+- `SENDER_NAME` (опционально) — имя отправителя в письмах (например, "NxtAmzn Support").
+- `NEXT_PUBLIC_APP_URL` (опционально) — базовый URL приложения для ссылок в письмах (сброс пароля, заказы). По умолчанию берётся из `VERCEL_URL` или `http://localhost:3000`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

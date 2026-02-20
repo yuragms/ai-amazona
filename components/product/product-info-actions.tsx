@@ -48,6 +48,7 @@ export function ProductInfoActionsClient({
     if (isAuthenticated) {
       const result = await addToCart(productId, quantity)
       if (result.ok) {
+        window.dispatchEvent(new Event("cart-updated"))
         showAddedToast()
       } else {
         toast.error(result.error)

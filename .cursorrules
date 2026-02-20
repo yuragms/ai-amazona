@@ -115,7 +115,7 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
     - [x] Order Statistics:
       - [x] Bar chart for order volume
       - [x] Order status distribution
-      - [ ] Peak ordering times
+      - [x] Peak ordering times
   - [x] Recent Orders Table:
     - [x] Implement data table with columns:
       - [x] Order ID
@@ -161,17 +161,17 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 
 ### 5. Advanced Features [ ]
 
-- [ ] Real-time notifications
-- [ ] Email system (Resend):
-  - Order confirmations
-  - Shipping updates
-  - Password reset
-- [ ] Search optimization
-- [ ] Performance optimization:
-  - Image optimization
-  - Caching strategies
-  - API optimization
-- [ ] Analytics and reporting
+- [x] Real-time notifications (admin: notification bell in header, polling every 30s, toasts for new orders & low stock, dropdown with links to Orders / Dashboard)
+- [x] Email system (Resend):
+  - [x] Order confirmations (Stripe webhook after PAID)
+  - [x] Shipping updates (admin sets status to SHIPPED)
+  - [x] Password reset (forgot-password + reset-password pages, VerificationToken)
+- [x] Search optimization (cached catalog products 60s, dynamic metadata for search SEO, normalized query length 200)
+- [x] Performance optimization:
+  - [x] Image optimization (next/image everywhere, remove unoptimized; minimumCacheTTL 60)
+  - [x] Caching strategies (unstable_cache: catalog categories 5m, product page 1m + revalidateTag on admin product CRUD; admin dashboard metrics 30s)
+  - [x] API optimization (cached queries, tag invalidation)
+- [x] Analytics and reporting (peak ordering times chart, sales by category in reports + export/print, /admin/analytics page)
 
 ### 6. Testing and Deployment [ ]
 

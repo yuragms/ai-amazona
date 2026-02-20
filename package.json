@@ -2,10 +2,17 @@
   "name": "ai-amazona",
   "version": "0.1.0",
   "private": true,
+  "browserslist": [
+    "Chrome >= 111",
+    "Firefox >= 111",
+    "Safari >= 16.4",
+    "Edge >= 111"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start:prod": "next build && next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",

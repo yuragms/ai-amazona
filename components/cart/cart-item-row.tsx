@@ -62,6 +62,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
             fill
             className="object-cover"
             sizes="96px"
+            quality={65}
           />
         ) : (
           <span className="flex h-full items-center justify-center text-xs text-muted-foreground">

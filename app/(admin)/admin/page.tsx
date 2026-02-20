@@ -3,6 +3,7 @@ import {
   getDashboardMetrics,
   getRevenueChartData,
   getOrderStatusDistribution,
+  getPeakOrderingTimes,
   getRecentOrders,
   getLowStockProducts,
   getTopProducts,
@@ -22,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { RevenueChart } from "@/components/admin/revenue-chart"
 import { OrderStatusChart } from "@/components/admin/order-status-chart"
+import { PeakOrderingChart } from "@/components/admin/peak-ordering-chart"
 import { CustomerAcquisitionChart } from "@/components/admin/customer-acquisition-chart"
 import { DashboardLive } from "@/components/admin/dashboard-live"
 import { ExportReports } from "@/components/admin/export-reports"
@@ -51,6 +53,7 @@ export default async function AdminPage() {
     metrics,
     revenueData,
     orderStatusData,
+    peakOrderingData,
     recentOrders,
     lowStockProducts,
     topProducts,
@@ -61,6 +64,7 @@ export default async function AdminPage() {
     getDashboardMetrics(),
     getRevenueChartData("90d"),
     getOrderStatusDistribution(),
+    getPeakOrderingTimes(30),
     getRecentOrders(10),
     getLowStockProducts(10),
     getTopProducts(5),
@@ -141,6 +145,7 @@ export default async function AdminPage() {
         <RevenueChart data={revenueData} />
         <OrderStatusChart data={orderStatusData} />
       </div>
+      <PeakOrderingChart data={peakOrderingData} />
 
       {/* Recent Orders */}
       <Card>

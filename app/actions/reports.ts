@@ -17,6 +17,66 @@ export type ReportData = {
     customerName: string
     customerEmail: string | null
   }>
+  salesByCategory: Array<{ categoryName: string; revenue: number; orderCount: number }>
+}
+
+export type SalesByCategoryRow = {
+  categoryName: string
+  revenue: number
+  orderCount: number
+}
+
+export async function getSalesByCategory(
+  fromDate: string,
+  toDate: string
+): Promise<SalesByCategoryRow[]> {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return []
+  }
+
+  const from = new Date(fromDate)
+  const to = new Date(toDate)
+  to.setHours(23, 59, 59, 999)
+
+  const orderItems = await prisma.orderItem.findMany({
+    where: {
+      order: {
+        createdAt: { gte: from, lte: to },
+        status: { notIn: ["CANCELLED", "REFUNDED"] },
+      },
+    },
+    select: {
+      quantity: true,
+      priceAtPurchase: true,
+      product: { select: { categoryId: true } },
+    },
+  })
+
+  const categoryIds = [...new Set(orderItems.map((i) => i.product.categoryId))]
+  const categories = await prisma.category.findMany({
+    where: { id: { in: categoryIds } },
+    select: { id: true, name: true },
+  })
+  const categoryMap = new Map(categories.map((c) => [c.id, c.name]))
+
+  const byCategory = new Map<string, { revenue: number; orderCount: number }>()
+  for (const item of orderItems) {
+    const cid = item.product.categoryId
+    const lineTotal = Number(item.priceAtPurchase) * item.quantity
+    const cur = byCategory.get(cid) ?? { revenue: 0, orderCount: 0 }
+    cur.revenue += lineTotal
+    cur.orderCount += item.quantity
+    byCategory.set(cid, cur)
+  }
+
+  return Array.from(byCategory.entries())
+    .map(([categoryId, { revenue, orderCount }]) => ({
+      categoryName: categoryMap.get(categoryId) ?? "Unknown",
+      revenue,
+      orderCount,
+    }))
+    .sort((a, b) => b.revenue - a.revenue)
 }
 
 export async function getReportData(
@@ -46,6 +106,8 @@ export async function getReportData(
   const averageOrderValue =
     totalOrders > 0 ? totalRevenue / totalOrders : 0
 
+  const salesByCategory = await getSalesByCategory(fromDate, toDate)
+
   return {
     from: fromDate,
     to: toDate,
@@ -60,6 +122,7 @@ export async function getReportData(
       customerName: o.user.name ?? "—",
       customerEmail: o.user.email,
     })),
+    salesByCategory,
   }
 }
 

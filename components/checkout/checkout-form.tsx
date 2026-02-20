@@ -95,6 +95,7 @@ function OrderSummarySidebar({
                     alt={it.product.name}
                     fill
                     className="object-cover"
+                    quality={65}
                     sizes="64px"
                   />
                 ) : (

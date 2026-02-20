@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import Image from "next/image"
 import { UploadDropzone } from "@/lib/uploadthing"
 import type { Product, Category } from "@prisma/client"
 import { Loader2, X } from "lucide-react"
@@ -283,11 +284,14 @@ export function ProductFormDialog({
             {images.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {images.map((url) => (
-                  <div key={url} className="relative">
-                    <img
+                  <div key={url} className="relative size-20 shrink-0 overflow-hidden rounded-lg border border-border">
+                    <Image
                       src={url}
                       alt=""
-                      className="h-20 w-20 rounded-lg border border-border object-cover"
+                      width={80}
+                      height={80}
+                      className="size-full object-cover"
+                      quality={65}
                     />
                     <button
                       type="button"

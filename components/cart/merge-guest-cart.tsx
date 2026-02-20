@@ -19,6 +19,7 @@ export function MergeGuestCart() {
     merged.current = true
     mergeGuestCart(items).then(() => {
       useGuestCartStore.getState().clear()
+      window.dispatchEvent(new Event("cart-updated"))
     })
   }, [status, session?.user])
 

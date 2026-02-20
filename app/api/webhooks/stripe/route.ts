@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe"
 import { prisma } from "@/lib/db"
+import { sendOrderConfirmation } from "@/lib/email"
 import type Stripe from "stripe"
 
 export async function POST(request: Request) {
@@ -86,6 +87,28 @@ export async function POST(request: Request) {
         },
       })
     })
+
+    if (order.user.email) {
+      const orderWithItems = await prisma.order.findUnique({
+        where: { id: order.id },
+        include: {
+          orderItems: { include: { product: { select: { name: true } } } },
+        },
+      })
+      if (orderWithItems) {
+        await sendOrderConfirmation({
+          to: order.user.email,
+          userName: order.user.name ?? order.user.email,
+          orderId: order.id,
+          total: String(orderWithItems.total),
+          items: orderWithItems.orderItems.map((it) => ({
+            name: it.product.name,
+            quantity: it.quantity,
+            price: String(it.priceAtPurchase),
+          })),
+        })
+      }
+    }
   }
 
   if (event.type === "payment_intent.succeeded") {
@@ -132,6 +155,28 @@ export async function POST(request: Request) {
         data: { status: "PAID", stripePaymentId: paymentIntent.id },
       })
     })
+
+    if (order.user.email) {
+      const orderWithItems = await prisma.order.findUnique({
+        where: { id: order.id },
+        include: {
+          orderItems: { include: { product: { select: { name: true } } } },
+        },
+      })
+      if (orderWithItems) {
+        await sendOrderConfirmation({
+          to: order.user.email,
+          userName: order.user.name ?? order.user.email,
+          orderId: order.id,
+          total: String(orderWithItems.total),
+          items: orderWithItems.orderItems.map((it) => ({
+            name: it.product.name,
+            quantity: it.quantity,
+            price: String(it.priceAtPurchase),
+          })),
+        })
+      }
+    }
   }
 
   return NextResponse.json({ received: true })
