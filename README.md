@@ -38,6 +38,13 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - `SENDER_NAME` (опционально) — имя отправителя в письмах (например, "NxtAmzn Support").
 - `NEXT_PUBLIC_APP_URL` (опционально) — базовый URL приложения для ссылок в письмах (сброс пароля, заказы). По умолчанию берётся из `VERCEL_URL` или `http://localhost:3000`.
 
+## Documentation
+
+- **[API](docs/API.md)** — описание HTTP API и server actions.
+- **[User guide](docs/USER-GUIDE.md)** — руководство для покупателей (регистрация, корзина, заказы, личный кабинет).
+- **[Admin](docs/ADMIN.md)** — документация для администратора (dashboard, товары, заказы, пользователи, отчёты).
+- **[Deployment](docs/DEPLOYMENT.md)** — деплой в production (окружение, CI/CD, мониторинг, бэкапы).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
