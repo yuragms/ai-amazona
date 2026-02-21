@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/db"
+import { slugify } from "@/lib/slugify"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { z } from "zod"
 
@@ -14,14 +15,6 @@ const productSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   images: z.array(z.string().url()).default([]),
 })
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-}
 
 export async function getCategories() {
   const session = await auth()
@@ -148,6 +141,40 @@ export async function updateProduct(
   revalidatePath("/products")
   revalidatePath(`/products/${parsed.data.slug}`)
   revalidateTag(`product-${parsed.data.slug}`, "max")
+  revalidateTag("product", "max")
+  revalidateTag("catalog", "max")
+  return { ok: true }
+}
+
+export type UpdateStockResult = { ok: true } | { ok: false; error: string }
+
+export async function updateProductStock(
+  productId: string,
+  stock: number
+): Promise<UpdateStockResult> {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return { ok: false, error: "Unauthorized" }
+  }
+  const parsed = z.number().int().min(0).safeParse(stock)
+  if (!parsed.success) {
+    return { ok: false, error: "Stock must be a non-negative integer" }
+  }
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { id: true, slug: true },
+  })
+  if (!product) return { ok: false, error: "Product not found" }
+
+  await prisma.product.update({
+    where: { id: productId },
+    data: { stock: parsed.data },
+  })
+
+  revalidatePath("/admin")
+  revalidatePath("/admin/products")
+  revalidatePath("/products")
+  revalidatePath(`/products/${product.slug}`)
   revalidateTag("product", "max")
   revalidateTag("catalog", "max")
   return { ok: true }

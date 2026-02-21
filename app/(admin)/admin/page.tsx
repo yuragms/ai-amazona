@@ -27,6 +27,8 @@ import { PeakOrderingChart } from "@/components/admin/peak-ordering-chart"
 import { CustomerAcquisitionChart } from "@/components/admin/customer-acquisition-chart"
 import { DashboardLive } from "@/components/admin/dashboard-live"
 import { ExportReports } from "@/components/admin/export-reports"
+import { LowStockAlerts } from "@/components/admin/low-stock-alerts"
+import { RecentOrdersTable } from "@/components/admin/recent-orders-table"
 import {
   DollarSign,
   ShoppingCart,
@@ -156,44 +158,7 @@ export default async function AdminPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {recentOrders.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              No orders yet.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="w-[100px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentOrders.map((o) => (
-                  <TableRow key={o.id}>
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {o.id.slice(0, 8)}…
-                    </TableCell>
-                    <TableCell>{o.customerName}</TableCell>
-                    <TableCell>${o.total.toFixed(2)}</TableCell>
-                    <TableCell>{statusLabels[o.status] ?? o.status}</TableCell>
-                    <TableCell>
-                      {new Date(o.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" })}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/orders?order=${o.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <RecentOrdersTable orders={recentOrders} statusLabels={statusLabels} />
         </CardContent>
       </Card>
 
@@ -290,36 +255,7 @@ export default async function AdminPage() {
             )}
           </CardHeader>
           <CardContent>
-            {lowStockProducts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                All products are well stocked.
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {lowStockProducts.map((p) => (
-                  <li
-                    key={p.id}
-                    className="flex items-center justify-between rounded-lg border p-2 text-sm"
-                  >
-                    <Link
-                      href={`/products/${p.slug}`}
-                      className="font-medium hover:underline"
-                    >
-                      {p.name}
-                    </Link>
-                    <span
-                      className={
-                        p.stock < 5
-                          ? "font-medium text-destructive"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      {p.stock} left
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <LowStockAlerts products={lowStockProducts} />
           </CardContent>
         </Card>
 

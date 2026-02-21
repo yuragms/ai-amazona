@@ -29,6 +29,15 @@ function formatDate(d: Date) {
   return d.toISOString().slice(0, 10)
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+}
+
 export function ExportReports() {
   const today = new Date()
   const defaultFrom = formatDate(new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000))
@@ -87,10 +96,12 @@ export function ExportReports() {
     if (!report) return
     const printWindow = window.open("", "_blank")
     if (!printWindow) return
+    const fromEsc = escapeHtml(report.from)
+    const toEsc = escapeHtml(report.to)
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
-        <head><title>Orders Report ${report.from} to ${report.to}</title>
+        <head><title>Orders Report ${fromEsc} to ${toEsc}</title>
         <style>
           body { font-family: system-ui; padding: 24px; }
           table { width: 100%; border-collapse: collapse; margin-top: 16px; }
@@ -101,7 +112,7 @@ export function ExportReports() {
         </style></head>
         <body>
           <h1>Orders Report</h1>
-          <p><strong>Period:</strong> ${report.from} to ${report.to}</p>
+          <p><strong>Period:</strong> ${fromEsc} to ${toEsc}</p>
           <div class="summary">
             <p><strong>Total Revenue:</strong> $${report.totalRevenue.toFixed(2)}</p>
             <p><strong>Total Orders:</strong> ${report.totalOrders}</p>
@@ -112,7 +123,7 @@ export function ExportReports() {
           <table>
             <thead><tr><th>Category</th><th>Revenue</th><th>Units</th></tr></thead>
             <tbody>
-              ${report.salesByCategory.map((r) => `<tr><td>${r.categoryName}</td><td>$${r.revenue.toFixed(2)}</td><td>${r.orderCount}</td></tr>`).join("")}
+              ${report.salesByCategory.map((r) => `<tr><td>${escapeHtml(r.categoryName)}</td><td>$${r.revenue.toFixed(2)}</td><td>${r.orderCount}</td></tr>`).join("")}
             </tbody>
           </table>
           ` : ""}
@@ -126,10 +137,10 @@ export function ExportReports() {
                 .map(
                   (o) =>
                     `<tr>
-                      <td>${o.id.slice(0, 8)}…</td>
+                      <td>${escapeHtml(o.id.slice(0, 8))}…</td>
                       <td>${new Date(o.createdAt).toLocaleString("en-US", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</td>
-                      <td>${o.customerName}</td>
-                      <td>${statusLabels[o.status] ?? o.status}</td>
+                      <td>${escapeHtml(o.customerName)}</td>
+                      <td>${escapeHtml(statusLabels[o.status] ?? o.status)}</td>
                       <td>$${o.total.toFixed(2)}</td>
                     </tr>`
                 )

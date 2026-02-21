@@ -14,6 +14,7 @@
 - Always refer to Scratchpad before planning the next step.
 
 ## Lessons
+- Auth protection for /admin and /dashboard must live in `middleware.ts` (Next.js only runs that filename). A file named `proxy.ts` was not executed as middleware; it was replaced by `middleware.ts`.
 
 ## Scratchpad
 
@@ -123,11 +124,11 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
       - [x] Order total
       - [x] Status
       - [x] Date
-    - [ ] Add sorting and filtering
+    - [x] Add sorting and filtering
     - [x] Quick actions (view)
   - [x] Low Stock Alerts:
     - [x] Products with stock below threshold
-    - [ ] Quick restock actions
+    - [x] Quick restock actions
     - [x] Stock level indicators
   - [x] Top Products:
     - [x] Best-selling products list
@@ -175,15 +176,15 @@ Development steps for ecommerce website (Amazon-like) with admin dashboard.
 
 ### 6. Testing and Deployment [ ]
 
-- [ ] Unit testing
-- [ ] Integration testing
-- [ ] E2E testing
-- [ ] Security audit
-- [ ] Production deployment:
-  - Environment setup
-  - CI/CD pipeline
-  - Monitoring
-  - Backup strategy
+- [x] Unit testing (Vitest, lib/utils + lib/slugify tests)
+- [x] Integration testing (Vitest: API routes auth forgot-password, reset-password, test-email with mocked db/email)
+- [x] E2E testing (Playwright: home, navigation, auth login/redirect; run npm run test:e2e, see e2e/README.md)
+- [x] Security audit (middleware.ts for route protection, XSS escape in export-reports, SECURITY.md checklist, npm audit)
+- [x] Production deployment:
+  - [x] Environment setup (.env.example, docs/DEPLOYMENT.md)
+  - [x] CI/CD pipeline (.github/workflows/ci.yml: lint, test, build)
+  - [x] Monitoring (GET /api/health, /api/health?db=1)
+  - [x] Backup strategy (docs/DEPLOYMENT.md)
 
 ### 7. Documentation [ ]
 
